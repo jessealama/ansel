@@ -1,0 +1,8 @@
+<Bindings>
+  <Binding name="Rapid-fire screenshots" header="Ansel">
+    AnselRapidFireScreenshot();
+  </Binding>
+  <Binding name="Single shot" header="Ansel">
+    AnselSingleShot();
+  </Binding>
+</Bindings>
