@@ -8,3 +8,16 @@ it implements
 
 In addition, we aim to establish a web site with which one can share
 one's World of Warcraft screenshots.
+
+h2. News
+
+Ansel is currently under development; no releases have been made.
+
+h2. Installation
+
+World of Warcraft addons can be installed by creating a subdirectory,
+Ansel, of the World of Warcraft Addons directory and putting the XML
+and lua files into that new directory.  One then launches World of
+Warcraft and proceeds.  Don't forget to set up keybindings for the
+various Ansel functions!
+
