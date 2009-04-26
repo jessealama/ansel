@@ -3,7 +3,7 @@ h2. Introduction
 Ansel aims to take World of Warcraft screenshots in a new direction:
 
 * rapid-fire screenshots to record battles;
+* geotagging.
 
-* geotagging;
-
-* 
+In addition, we aim to establish a web site with which one can share
+one's World of Warcraft screenshots.
