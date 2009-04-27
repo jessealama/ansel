@@ -11,3 +11,7 @@
   Once ansel is available on Curse, etc., users presumably won't need
   this functionality.  A Windows install script would be for those
   users who don't use Curse, etc., to install their addons.
+* TODO Allow for hiding the gui and then taking a screenshot
+  Perhaps this feature could be activated by holding down the shift
+  key and whatever key is bound to AnselTakeScreenshot.
+  
