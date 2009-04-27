@@ -99,7 +99,7 @@ function Ansel_OnEvent (event)
       local x,y      = GetPlayerMapPosition("player");
       if (uihidden) then
 	 UIParent:Show ();
-	 uihidden = true;
+	 uihidden = false;
       end
       purpleChatMessage ("Screenshot taken in subzone " .. subzone .. " of " .. zone .. " at gametime " .. h .. ":" .. m .. ":" .. s .. " in location (" .. x .. "," .. y ..")");
    end
