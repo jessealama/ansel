@@ -1,4 +1,4 @@
-## Interface: 31000
+## Interface: 31100
 ## Title: Ansel
 ## Notes: A screenshot utility to rule them all
 ## Dependencies:
