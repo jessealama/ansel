@@ -2,5 +2,6 @@
 ## Title: Ansel
 ## Notes: A screenshot utility to rule them all
 ## Dependencies:
+## SavedVariablesPerCharacter: AnselPhotoDB
 Ansel.lua
 Ansel.xml
