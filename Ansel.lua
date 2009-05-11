@@ -13,7 +13,11 @@ BINDING_HEADER_ANSEL = "Ansel"
 -- screenshot is taken.  We use these data to figure out what file in
 -- the Screenshots directory corresponds to the the screenshot we
 -- took.
+local current_weekday;
+local current_year, current_month, current_day;
 local current_hour, current_minute, current_second;
+local current_x, current_y;
+local current_zone, current_subzone;
 
 -- We keep track of whether the UI was hidden before we took the last
 -- screenshot.
@@ -92,7 +96,7 @@ end
 
 function AnselRapidFireScreenshot ()
    purpleAnselChatMessage ("Rapid-fire screenshots not yet enabled;");
-   purpleAnselChatMessage ("Taking a single screenshot instead.")
+   purpleAnselChatMessage ("taking a single screenshot instead.")
    Screenshot ();
 end
 
