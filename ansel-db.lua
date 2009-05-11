@@ -10,70 +10,71 @@ local wow_directory = "/Applications/World of Warcraft";
 local wow_screenshot_dir = wow_directory .. "/" .. "Screenshots";
 local wow_accounts_dir = wow_directory .. "/WTF/Account";
 
-function time_less_than (month1, day1, year1, hour1, minute1, second1,
-			 month2, day2, year2, hour2, minute2, second2)
+function time_less_than_eq (month1, day1, year1, hour1, minute1, second1,
+			    month2, day2, year2, hour2, minute2, second2)
    return 
-     (year1 < year2) or
-     (year1 == year2 and month1 < month2) or
-     (month1 == month2 and day1 < day2) or
-     (day1 == day2 and hour1 < hour2) or
-     (hour1 == hour2 and minute1 < minute2) or
-     (minute1 == minute2 and second1 < second2);
+   (
+      (year1 < year2) or
+      (year1 == year2 and month1 < month2) or
+      (year1 == year2 and month1 == month2 and day1 < day2) or
+      (year1 == year2 and month1 == month2 and day1 == day2 and hour1 < hour2) or
+      (year1 == year2 and month1 == month2 and day1 == day2 and hour1 == hour2 and minute1 < minute2) or
+      (year1 == year2 and month1 == month2 and day1 == day2 and hour1 == hour2 and minute1 == minute2 and second1 < second2) or
+      (year1 == year2 and month1 == month2 and day1 == day2 and hour1 == hour2 and minute1 == minute2 and second1 == second2)
+  )
 end
 
 function screenshot_info (screenshot)
    -- Screenshot names are "ScreenShot_MMDDYY_HHMMSS"
-   local month  = string.sub (screenshot, 12, 13);
-   local day    = string.sub (screenshot, 14, 15);
-   local year   = string.sub (screenshot, 16, 17);
-   local hour   = string.sub (screenshot, 19, 20);
-   local minute  = string.sub (screenshot, 21, 22);
-   local second   = string.sub (screenshot, 23, 24);
-   return month, day, year, hour, minute, second
+   local month  = tonumber (string.sub (screenshot, 12, 13));
+   local day    = tonumber (string.sub (screenshot, 14, 15));
+   local year   = tonumber (string.sub (screenshot, 16, 17));
+   local hour   = tonumber (string.sub (screenshot, 19, 20));
+   local minute = tonumber (string.sub (screenshot, 21, 22));
+   local second = tonumber (string.sub (screenshot, 23, 24));
+   return month, day, year, hour, minute, second;
+end
+
+function scan_screenshots ()
+   local screenshots = {};
+   for screenshot in lfs.dir (wow_screenshot_dir) do
+      local screenshot_path = wow_accounts_dir .. "/" .. screenshot;
+      if (screenshot ~= "." and 
+	  screenshot ~= ".." and
+	  lfs.attributes (screenshot_path, "mode") ~= "directory") then
+	 local ss_month, ss_day, ss_year, ss_hour, ss_minute, ss_second
+	    = screenshot_info (screenshot);
+	 table.insert (screenshots, { screenshot, ss_year, ss_month, ss_day, ss_hour, ss_minute, ss_second });
+      end
+   end
+   return screenshots;
 end
 
 function db_entry_corresponds_to_screenshot (db_entry, screenshot)
    local ss_month, ss_day, ss_year, ss_hour, ss_minute, ss_second
       = screenshot_info (screenshot);
-   local ansel_pre_ss_month = db_entry["preshot_month"];
-   local ansel_pre_ss_day = db_entry["preshot day"];
-   local ansel_pre_ss_year = db_entry["preshot year"];
-   local ansel_pre_ss_hour = db_entry["preshot hour"];
-   local ansel_pre_ss_minute = db_entry["preshot minute"];
-   local ansel_pre_ss_second = db_entry["preshot second"];
-   local ansel_post_ss_month = db_entry["postshot_month"];
-   local ansel_post_ss_day = db_entry["postshot day"];
-   local ansel_post_ss_year = db_entry["postshot year"];
-   local ansel_post_ss_hour = db_entry["postshot hour"];
-   local ansel_post_ss_minute = db_entry["postshot minute"];
-   local ansel_post_ss_second = db_entry["postshot second"];
-   return (time_less_than (ansel_pre_ss_month,
-			   ansel_pre_ss_day,
-			   ansel_pre_ss_year,
-			   ansel_pre_ss_hour,
-			   ansel_pre_ss_minute,
-			   ansel_pre_ss_second,
-			   ss_month,
-			   ss_day,
-			   ss_year,
-			   ss_hour,
-			   ss_minute,
-			   ss_second)
+   local pre_ss_month = db_entry["preshot month"];
+   local pre_ss_day = db_entry["preshot day"];
+   local pre_ss_year = db_entry["preshot year"];
+   local pre_ss_hour = db_entry["preshot hour"];
+   local pre_ss_minute = db_entry["preshot minute"];
+   local pre_ss_second = db_entry["preshot second"];
+   local post_ss_month = db_entry["postshot month"];
+   local post_ss_day = db_entry["postshot day"];
+   local post_ss_year = db_entry["postshot year"];
+   local post_ss_hour = db_entry["postshot hour"];
+   local post_ss_minute = db_entry["postshot minute"];
+   local post_ss_second = db_entry["postshot second"];
+   return (time_less_than_eq (pre_ss_month, pre_ss_day, pre_ss_year,
+			      pre_ss_hour, pre_ss_minute, pre_ss_second,
+			      ss_month, ss_day, ss_year,
+			      ss_hour, ss_minute, ss_second)
 	   and
-	   time_less_than (ss_month,
-			   ss_day,
-			   ss_year,
-			   ss_hour,
-			   ss_minute,
-			   ss_second,
-			   ansel_post_ss_month,
-			   ansel_post_ss_day,
-			   ansel_post_ss_year,
-			   ansel_post_ss_hour,
-			   ansel_post_ss_minute,
-			   ansel_post_ss_second));
+	   time_less_than_eq (ss_month, ss_day, ss_year,
+			      ss_hour, ss_minute, ss_second,
+			      post_ss_month, post_ss_day, post_ss_year,
+			      post_ss_hour, post_ss_minute, post_ss_second));
 end
-
 
 -- Gather the available accounts, realms, and characters
 local wow_accounts = {};
@@ -95,9 +96,8 @@ for account in lfs.dir (wow_accounts_dir) do
 		  local ansel_saved_variables_path = saved_variables_dir .. "/" .. "Ansel.lua";
 		  if (lfs.attributes (ansel_saved_variables_path) ~= nil) then
 		     local f;
-		     print ("about to load: " .. ansel_saved_variables_path);
-		     f = loadfile (ansel_saved_variables_path);
-		     f();
+		     lfs.chdir (saved_variables_dir);
+		     require 'Ansel';
 		     local character_db = AnselPhotoDB;
 		     table.insert (realm_characters, { character, character_db });
 		  else
@@ -112,49 +112,67 @@ for account in lfs.dir (wow_accounts_dir) do
    end
 end
 
--- Print all this out
-for i = 1, #wow_accounts do
-  local account = wow_accounts[i];
-  local account_name = account[1];
-  local account_dir = wow_accounts_dir .. "/" .. account_name;
-  local account_realms = account[2];
-  print ("account: " .. account_name);
-  for j = 1, #account_realms do
-    local realm = account_realms[j];
-    local realm_name = realm[1];
-    local realm_dir = account_dir .. "/" .. realm_name;
-    local realm_characters = realm[2];
-    print ("realm: " .. realm_name);
-    for k = 1, #realm_characters do
-      local character = realm_characters[k];
-      local character_name = character[1];
-      local character_db = character[2];
-      print ("character: " .. character_name);
-      if (character_db == nil) then
-	 print ("No Ansel data available");
-      else 
-	 print ("Ansel data available");
+local screenshots = scan_screenshots ();
+
+function build_screenshot_db_correspondences ()
+   local num_screenshots = #screenshots;
+   local correspondences = {};
+   local num_accounts = #wow_accounts;
+   for j = 1, num_screenshots do
+      local ss_record = screenshots[j];
+      local screenshot = ss_record[1];
+      for k = 1, num_accounts do
+	 local account = wow_accounts[k];
+	 local account_name = account[1];
+	 local account_dir = wow_accounts_dir .. "/" .. account_name;
+	 local account_realms = account[2];
+	 local num_account_realms = #account_realms;
+	 for l = 1, num_account_realms do
+	    local realm = account_realms[l];
+	    local realm_name = realm[1];
+	    local realm_dir = account_dir .. "/" .. realm_name;
+	    local realm_characters = realm[2];
+	    local num_realm_characters = #realm_characters;
+	    for m = 1, num_realm_characters do
+	       local character = realm_characters[m];
+	       local character_name = character[1];
+	       local character_db = character[2];
+	       if (character_db ~= nil) then
+		  local num_db_entries = #character_db;
+		  for n = 1, num_db_entries do
+		     local db_entry = character_db[n];
+		     if (db_entry_corresponds_to_screenshot (db_entry, screenshot)) then
+			table.insert (correspondences, { screenshot, db_entry });
+		     end
+		  end
+	       end
+	    end
+	 end      
       end
-    end
- end
+   end
+   return correspondences;
 end
 
-local wow_screenshots = {};
+function coherent_zones (db_entry) 
+   return (db_entry["preshot zone"] == db_entry["postshot zone"]);
+end
 
-for file in lfs.dir (wow_screenshot_dir) do
-   if (file ~= "." and file ~= "..") then
-      table.insert (wow_screenshots, file);
+local correspondences = build_screenshot_db_correspondences ();
+
+function print_correspondences ()
+   local num_correspondences = #correspondences;
+   for i = 1, num_correspondences do
+      local correspondence = correspondences[i];
+      local screenshot = correspondence[1];
+      local db_entry = correspondence[2];
+      if (coherent_zones (db_entry)) then
+	 print ("found a coherent match for " .. screenshot);
+      else
+	 print ("found an incoherent match for " .. screenshot);
+      end
    end
 end
 
-print (#wow_screenshots .. " screenshots found");
+print_correspondences ();
 
-local month, day, year, hour, minute, second = 
-	  screenshot_info ("ScreenShot_042709_134625.jpeg");
 
-print ("month: " .. month);
-print ("day: " .. day);
-print ("year: " .. year);
-print ("hour: " .. hour);
-print ("minute: " .. minute);
-print ("second: " .. second);
